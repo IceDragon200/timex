@@ -79,8 +79,8 @@ defmodule Timex.Comparable.Diff do
   defp do_diff(_, _, granularity), do: {:error, {:invalid_granularity, granularity}}
 
   defp diff_years(a, b) do
-    {start_date, _} = :calendar.gregorian_seconds_to_datetime(div(a, 1_000 * 1_000))
-    {end_date, _} = :calendar.gregorian_seconds_to_datetime(div(b, 1_000 * 1_000))
+    {start_date, _} = Timex.Calendar.gregorian_seconds_to_datetime(div(a, 1_000 * 1_000))
+    {end_date, _} = Timex.Calendar.gregorian_seconds_to_datetime(div(b, 1_000 * 1_000))
 
     if a > b do
       diff_years(end_date, start_date, 0)
@@ -96,9 +96,9 @@ defmodule Timex.Comparable.Diff do
   defp diff_years({y1, m, d}, {y2, _, _} = ed, acc) when y1 < y2 do
     sd2 = {y1 + 1, m, d}
 
-    if :calendar.valid_date(sd2) do
-      sd2_secs = :calendar.datetime_to_gregorian_seconds({sd2, {0, 0, 0}})
-      ed_secs = :calendar.datetime_to_gregorian_seconds({ed, {0, 0, 0}})
+    if Timex.Calendar.valid_date?(sd2) do
+      sd2_secs = Timex.Calendar.datetime_to_gregorian_seconds({sd2, {0, 0, 0}})
+      ed_secs = Timex.Calendar.datetime_to_gregorian_seconds({ed, {0, 0, 0}})
 
       if sd2_secs <= ed_secs do
         diff_years(sd2, ed, acc + 1)
@@ -114,8 +114,8 @@ defmodule Timex.Comparable.Diff do
   defp diff_months(a, a), do: 0
 
   defp diff_months(a, b) do
-    {start_date, _} = :calendar.gregorian_seconds_to_datetime(div(a, 1_000 * 1_000))
-    {end_date, _} = :calendar.gregorian_seconds_to_datetime(div(b, 1_000 * 1_000))
+    {start_date, _} = Timex.Calendar.gregorian_seconds_to_datetime(div(a, 1_000 * 1_000))
+    {end_date, _} = Timex.Calendar.gregorian_seconds_to_datetime(div(b, 1_000 * 1_000))
     do_diff_months(start_date, end_date)
   end
 

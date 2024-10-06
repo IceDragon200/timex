@@ -54,7 +54,7 @@ defimpl Timex.Protocol, for: DateTime do
 
   def century(%DateTime{:year => year}), do: Timex.century(year)
 
-  def is_leap?(%DateTime{year: year}), do: :calendar.is_leap_year(year)
+  def is_leap?(%DateTime{year: year}), do: Timex.Calendar.leap_year?(year)
 
   def beginning_of_day(%DateTime{time_zone: time_zone, microsecond: {_, precision}} = datetime) do
     us = Timex.DateTime.Helpers.construct_microseconds(0, precision)
@@ -311,7 +311,7 @@ defimpl Timex.Protocol, for: DateTime do
         :minute => min,
         :second => sec
       }) do
-    :calendar.valid_date({y, m, d}) and Timex.is_valid_time?({h, min, sec})
+    Timex.Calendar.valid_date?(y, m, d) and Timex.is_valid_time?({h, min, sec})
   end
 
   def iso_week(%DateTime{:year => y, :month => m, :day => d}),
@@ -560,10 +560,10 @@ defimpl Timex.Protocol, for: DateTime do
       new_year < 0 ->
         {:error, :shift_to_invalid_date}
 
-      m == 2 and d == 29 and :calendar.is_leap_year(y) and :calendar.is_leap_year(new_year) ->
+      m == 2 and d == 29 and Timex.Calendar.leap_year?(y) and Timex.Calendar.leap_year?(new_year) ->
         shifted
 
-      m == 2 and d == 29 and :calendar.is_leap_year(y) ->
+      m == 2 and d == 29 and Timex.Calendar.leap_year?(y) ->
         # Shift to March 1st in non-leap years
         %DateTime{shifted | month: 3, day: 1}
 
@@ -589,7 +589,7 @@ defimpl Timex.Protocol, for: DateTime do
         {year + add_years + 1, total_months - 12}
       end
 
-    ldom = :calendar.last_day_of_the_month(year, month)
+    ldom = Timex.Calendar.last_day_of_the_month(year, month)
 
     cond do
       day > ldom ->
@@ -616,7 +616,7 @@ defimpl Timex.Protocol, for: DateTime do
     if year < 0 do
       {:error, :shift_to_invalid_date}
     else
-      ldom = :calendar.last_day_of_the_month(year, month)
+      ldom = Timex.Calendar.last_day_of_the_month(year, month)
 
       cond do
         day > ldom ->
@@ -637,7 +637,7 @@ defimpl Timex.Protocol, for: DateTime do
   # Positive shifts
   defp shift_by(%DateTime{year: year, month: month, day: day} = datetime, value, :days)
        when value > 0 do
-    ldom = :calendar.last_day_of_the_month(year, month)
+    ldom = Timex.Calendar.last_day_of_the_month(year, month)
 
     cond do
       day + value <= ldom ->
@@ -660,14 +660,14 @@ defimpl Timex.Protocol, for: DateTime do
         %DateTime{datetime | day: day + value}
 
       month - 1 >= 1 ->
-        ldom = :calendar.last_day_of_the_month(year, month - 1)
+        ldom = Timex.Calendar.last_day_of_the_month(year, month - 1)
         shift_by(%DateTime{datetime | month: month - 1, day: ldom}, value + day, :days)
 
       year == 0 ->
         {:error, :shift_to_invalid_date}
 
       :else ->
-        ldom = :calendar.last_day_of_the_month(year - 1, 12)
+        ldom = Timex.Calendar.last_day_of_the_month(year - 1, 12)
         shift_by(%DateTime{datetime | year: year - 1, month: 12, day: ldom}, value + day, :days)
     end
   end

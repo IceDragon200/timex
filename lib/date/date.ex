@@ -104,7 +104,7 @@ defimpl Timex.Protocol, for: Date do
     do: 1 + Timex.diff(date, %Date{:year => date.year, :month => 1, :day => 1}, :days)
 
   def is_valid?(%Date{:year => y, :month => m, :day => d}) do
-    :calendar.valid_date({y, m, d})
+    Timex.Calendar.valid_date?(y, m, d)
   end
 
   def iso_week(%Date{:year => y, :month => m, :day => d}),
@@ -227,8 +227,8 @@ defimpl Timex.Protocol, for: Date do
   def shift(_, _), do: {:error, :badarg}
 
   defp to_seconds(%Date{year: y, month: m, day: d}, :zero),
-    do: :calendar.datetime_to_gregorian_seconds({{y, m, d}, {0, 0, 0}})
+    do: Timex.Calendar.datetime_to_gregorian_seconds({{y, m, d}, {0, 0, 0}})
 
   defp to_seconds(%Date{year: y, month: m, day: d}, :epoch),
-    do: :calendar.datetime_to_gregorian_seconds({{y, m, d}, {0, 0, 0}}) - @epoch_seconds
+    do: Timex.Calendar.datetime_to_gregorian_seconds({{y, m, d}, {0, 0, 0}}) - @epoch_seconds
 end
