@@ -589,7 +589,7 @@ defimpl Timex.Protocol, for: DateTime do
         {year + add_years + 1, total_months - 12}
       end
 
-    ldom = Timex.Calendar.last_day_of_the_month(year, month)
+    ldom = Calendar.ISO.days_in_month(year, month)
 
     cond do
       day > ldom ->
@@ -616,7 +616,7 @@ defimpl Timex.Protocol, for: DateTime do
     if year < 0 do
       {:error, :shift_to_invalid_date}
     else
-      ldom = Timex.Calendar.last_day_of_the_month(year, month)
+      ldom = Calendar.ISO.days_in_month(year, month)
 
       cond do
         day > ldom ->
@@ -637,7 +637,7 @@ defimpl Timex.Protocol, for: DateTime do
   # Positive shifts
   defp shift_by(%DateTime{year: year, month: month, day: day} = datetime, value, :days)
        when value > 0 do
-    ldom = Timex.Calendar.last_day_of_the_month(year, month)
+    ldom = Calendar.ISO.days_in_month(year, month)
 
     cond do
       day + value <= ldom ->
@@ -660,14 +660,14 @@ defimpl Timex.Protocol, for: DateTime do
         %DateTime{datetime | day: day + value}
 
       month - 1 >= 1 ->
-        ldom = Timex.Calendar.last_day_of_the_month(year, month - 1)
+        ldom = Calendar.ISO.days_in_month(year, month - 1)
         shift_by(%DateTime{datetime | month: month - 1, day: ldom}, value + day, :days)
 
       year == 0 ->
         {:error, :shift_to_invalid_date}
 
       :else ->
-        ldom = Timex.Calendar.last_day_of_the_month(year - 1, 12)
+        ldom = Calendar.ISO.days_in_month(year - 1, 12)
         shift_by(%DateTime{datetime | year: year - 1, month: 12, day: ldom}, value + day, :days)
     end
   end

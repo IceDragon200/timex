@@ -153,7 +153,7 @@ defmodule Timex.PosixTimezone do
         :else ->
           day_shift = (week - 1) * 7
           day = first_week_date.day + day_shift
-          ldom = :calendar.last_day_of_the_month(year, month)
+          ldom = Calendar.ISO.days_in_month(year, month)
 
           date =
             if ldom > day do

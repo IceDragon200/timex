@@ -57,25 +57,11 @@ defmodule Timex.Helpers do
 
   def iso_day_to_date_tuple(_, _), do: {:error, :invalid_year_and_day}
 
-  def days_in_month(year, month) when is_year(year) and is_month(month) do
-    :calendar.last_day_of_the_month(year, month)
+  def days_in_month(_year, month) when month < 1 or month > 12 do
+    {:error, :invalid_month}
   end
 
-  def days_in_month(year, month) do
-    valid_year? = year > 0
-    valid_month? = month in @valid_months
-
-    cond do
-      !valid_year? && valid_month? ->
-        {:error, :invalid_year}
-
-      valid_year? && !valid_month? ->
-        {:error, :invalid_month}
-
-      true ->
-        {:error, :invalid_year_and_month}
-    end
-  end
+  defdelegate days_in_month(year, month), to: Calendar.ISO
 
   @doc """
   Given a {year, month, day} tuple, normalizes it so

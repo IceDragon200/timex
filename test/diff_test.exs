@@ -8,6 +8,12 @@ defmodule DiffTests do
     assert expected === difference
   end
 
+  test "diff with negative dates of same month and end day greater than start day" do
+    difference = Timex.diff(~D[-0001-01-02], ~D[0000-01-01], :months)
+    expected = -12
+    assert expected === difference
+  end
+
   test "diff with same month and end day equal to start day" do
     difference = Timex.diff(~D[2018-01-01], ~D[2017-01-01], :months)
     expected = 12

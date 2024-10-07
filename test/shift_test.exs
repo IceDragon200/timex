@@ -174,7 +174,7 @@ defmodule ShiftTests do
 
   test "shift to zero" do
     result = Timex.shift(~N[0000-01-01 00:00:01], seconds: -1)
-    expected = ~N[0000-01-01 00:00:00]
+    expected = ~N[0000-01-01 00:00:00.000000]
     assert expected === result
   end
 

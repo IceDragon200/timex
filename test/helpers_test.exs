@@ -1,13 +1,17 @@
 defmodule HelpersTests do
   use ExUnit.Case, async: true
+
   doctest Timex.Helpers
 
   alias Timex.Helpers
 
+  test "can handle negative years" do
+    assert 31 == Helpers.days_in_month(-1, 3)
+  end
+
   test "days_in_month with invalid year and month" do
-    assert {:error, :invalid_year} = Helpers.days_in_month(-1, 3)
     assert {:error, :invalid_month} = Helpers.days_in_month(1, -3)
-    assert {:error, :invalid_year_and_month} = Helpers.days_in_month(-1, -3)
+    assert {:error, :invalid_month} = Helpers.days_in_month(-1, -3)
   end
 
   test "normalize_date_tuple" do

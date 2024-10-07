@@ -1,5 +1,9 @@
 defmodule Timex.Calendar do 
-  @seconds_per_day 24 * 60 * 60
+  @seconds_per_minute 60
+
+  @seconds_per_hour 60 * @seconds_per_minute
+
+  @seconds_per_day 24 * @seconds_per_hour
 
   @type year :: integer()
   @type month :: 1..12
@@ -10,20 +14,23 @@ defmodule Timex.Calendar do
 
   def valid_date?({y, m, d}), do: valid_date?(y, m, d)
 
-  @spec last_day_of_the_month(year(), month()) :: ldom()
-  def last_day_of_the_month(_y, 4), do: 30
-  def last_day_of_the_month(_y, 6), do: 30
-  def last_day_of_the_month(_y, 9), do: 30
-  def last_day_of_the_month(_y, 11), do: 30
-  def last_day_of_the_month(y, 2) do
-    if leap_year?(y) do
-      29
-    else
-      28
-    end
-  end
-  def last_day_of_the_month(_y, m) when m > 0 and m < 13 do
-    31
+  @spec seconds_to_time(integer()) :: :calendar.time()
+  def seconds_to_time(secs) when is_integer(secs) do
+    secs = rem(secs, @seconds_per_day)
+    secs =
+      if secs < 0 do
+        @seconds_per_day + secs
+      else
+        secs
+      end
+
+    hour = div(secs, @seconds_per_hour)
+    minute =
+      secs
+      |> div(@seconds_per_minute)
+      |> rem(@seconds_per_minute)
+    sec = rem(secs, @seconds_per_minute)
+    {hour, minute, sec}
   end
 
   def datetime_to_gregorian_seconds({{y, m, d}, time}) do
@@ -31,10 +38,15 @@ defmodule Timex.Calendar do
   end
 
   def gregorian_seconds_to_datetime(secs) do
-    iso_days = div(secs, @seconds_per_day)
+    iso_days =
+      if secs < 0 do
+        div(secs, @seconds_per_day) - 1
+      else
+        div(secs, @seconds_per_day)
+      end
     secs = rem(secs, @seconds_per_day)
     date = Calendar.ISO.date_from_iso_days(iso_days)
-    time = :calendar.seconds_to_time(secs)
+    time = seconds_to_time(secs)
     {date, time}
   end
 end

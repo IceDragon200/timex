@@ -11,6 +11,12 @@ defmodule DateFormatTest.GeneralFormatting do
     assert Timex.from_now(Timex.shift(DateTime.utc_now(), days: -1), "en") == "yesterday"
   end
 
+  test "can format negative year timestamp" do
+    datetime = ~U[-0223-12-13T12:44:32.000000Z]
+
+    assert "-0223-12-13T12:44:32.000000+00:00" == Timex.format!(datetime, "{ISO:Extended}")
+  end
+
   test "converts maps and tuples before formatting" do
     map = %{day: 9, hour: 15, min: 40, month: 7, sec: 33, usec: 0, year: 2017}
     tuple = {{2017, 7, 9}, {15, 40, 33}} = Timex.to_erl(map)
